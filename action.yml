@@ -3,7 +3,7 @@ author: "Sean Erswell-Liljefelt"
 description: "Sends custom deployment metrics to Google Cloud Monitoring"
 branding:
   color: blue
-  icon: bar-chart 
+  icon: bar-chart
 inputs:
   google-cloud-project:
     description: "The Google Cloud project_id to which the metrics should be sent"
@@ -27,7 +27,7 @@ inputs:
     description: "The result so far. (suggest one of 'queued' 'pending' 'error' 'in_progress' 'failure' 'inactive' or 'success'"
     required: true
   version:
-    description: "The version or commit being deployed (e.g. v1.0.5 or git short SHA"
+    description: "The version or commit being deployed (e.g. v1.0.5 or git short SHA)"
     required: true
   metric-value:
     description: "By default we send the value 1 for any deployment update. If for some reason you want to change that you can specify any integer"
