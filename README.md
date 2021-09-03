@@ -18,7 +18,7 @@ This action allows you to hook into deployment workflows and send the informatio
 
 Unfortunately almost all inputs are mandatory as it is not easy to give sane defaults for most of them. But given its a copy / paste to different steps and only modifying 1-2 values each time, it's perhaps not so bad.
 
-For wide scale adoption across multiple projects, consider using automatic values such as attributes of the git.context object or outputs from previous steps. I will try to give some examples here - but go crazy!
+For wide scale adoption across multiple projects, consider using automatic values such as attributes of the github context object or outputs from previous steps. I will try to give some examples here - but go crazy!
 
 | Input                     | Default | Details                                                                                                       | Possible Automatic Example                 |
 | ------------------------- | ------- | ------------------------------------------------------------------------------------------------------------- | ------------------------------------------ |
@@ -29,7 +29,7 @@ For wide scale adoption across multiple projects, consider using automatic value
 | `environment`             | none    | The environment into which the service/application is being deployed                                          | `${{ github.ref }}`                        |
 | `status`                  | none    | What stage of the deployment process is occurring (suggest either 'started' or 'finished')                    | N/A                                        |
 | `result`                  | none    | The result so far. (suggest one of 'queued' 'pending' 'error' 'in_progress' 'failure' 'inactive' or 'success' | `${{ steps.deploy.outcome }}`              |
-| `version`                 | none    | The version or commit being deployed (e.g. v1.0.5 or git short SHA)                                           | `${{ github.sha }}` or `${{ github.ref }}` |
+| `version`                 | none    | The version or commit being deployed (e.g. v1.0.5 or git short SHA)                                           | `${{ github.sha }}` or `${{ github.sha }}` |
 
 ## Example usage
 
