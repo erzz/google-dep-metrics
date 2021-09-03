@@ -75,6 +75,8 @@ jobs:
 
 ## Using the data
 
+**Special Note:** It can take 3-5 minutes for metrics to show up in google according to their SLA on metric latency ... so be a little patient if they don't appear immediately :)
+
 I will try to populate some cool examples as I go along here. But a simple example is getting Deployment Frequency for a service. You will likely want to filter or group by environment for best results!
 
 ![GitHub Logo](media/dep_frequency_example.png)
