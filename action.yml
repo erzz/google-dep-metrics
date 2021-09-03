@@ -1,0 +1,57 @@
+name: "Google Deployment Metrics"
+author: "Sean Erswell-Liljefelt"
+description: "Sends custom deployment metrics to Google Cloud Monitoring"
+branding:
+  color: blue
+  icon: bar-chart 
+inputs:
+  google-cloud-project:
+    description: "The Google Cloud project_id to which the metrics should be sent"
+    required: true
+  service-account-keyfile:
+    description: "A secret holding the service account keyfile to use for authentication with your project"
+    required: true
+  team:
+    description: "The name of the team the deployed service belongs to."
+    required: true
+  service:
+    description: "The name of the service or application being deployed."
+    required: true
+  environment:
+    description: "The environment into which the service/application is being deployed (suggest 'production' or 'branch-name')"
+    required: true
+  status:
+    description: "What stage of the deployment process is occurring (suggest either 'started' or 'finished')"
+    required: true
+  result:
+    description: "The result so far. (suggest one of 'queued' 'pending' 'error' 'in_progress' 'failure' 'inactive' or 'success'"
+    required: true
+  version:
+    description: "The version or commit being deployed (e.g. v1.0.5 or git short SHA"
+    required: true
+  metric-value:
+    description: "By default we send the value 1 for any deployment update. If for some reason you want to change that you can specify any integer"
+    required: false
+    default: "1"
+runs:
+  using: "composite"
+  steps:
+    - name: Send metric
+      shell: bash
+      env:
+        GOOGLE_CLOUD_PROJECT: ${{ inputs.google-cloud-project }}
+        SA_KEY: ${{ inputs.service-account-keyfile }}
+        TEAM: ${{ inputs.team}}
+        SERVICE: ${{ inputs.service }}
+        ENVIRONMENT: ${{ inputs.environment }}
+        STATUS: ${{ inputs.status }}
+        RESULT: ${{ inputs.result }}
+        VERSION: ${{ inputs.version }}
+        METRIC_VALUE: ${{ inputs.metric-value }}
+      run: |
+        python -m venv venv
+        source venv/bin/activate
+        pip install -r requirements.txt
+        echo "$SA_KEY" > $(pwd)/sa.json
+        export GOOGLE_APPLICATION_CREDENTIALS=$(pwd)/sa.json
+        python3 push_deploy_metric.py --team "$TEAM" --service "$SERVICE" --environment "$ENVIRONMENT" --status "$STATUS" --result "$RESULT" --version "$VERSION" --metric-value "$METRIC_VALUE"

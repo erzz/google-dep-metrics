@@ -1,0 +1,40 @@
+name: Tests
+on: push
+
+jobs:
+  # <---------------- TEST BASIC CONFIG ------------------>
+  basic:
+    name: Basic
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+
+      - name: Start
+        uses: ./
+        with:
+          google-cloud-project: ${{ secrets.TEST_PROJECT }}
+          service-account-keyfile: ${{ secrets.TEST_SA }}
+          team: google-dep-metrics
+          service: action-app
+          environment: test
+          status: started
+          result: pending
+          version: ${{ github.ref }}
+
+      - name: Fake deploy
+        id: deploy
+        run: echo "Deployed"
+
+      - name: Finish
+        uses: ./
+        with:
+          google-cloud-project: ${{ secrets.TEST_PROJECT }}
+          service-account-keyfile: ${{ secrets.TEST_SA }}
+          team: google-dep-metrics
+          service: action-app
+          environment: test
+          status: finished
+          result: ${{ steps.deploy.outcome }}
+          version: ${{ github.ref }}
+
