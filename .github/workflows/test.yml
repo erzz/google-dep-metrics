@@ -20,7 +20,7 @@ jobs:
           environment: test
           status: started
           result: pending
-          version: v0.1.1
+          version: ${{ github.ref }}
 
       - name: Fake deploy
         id: deploy
@@ -36,5 +36,5 @@ jobs:
           environment: test
           status: finished
           result: ${{ steps.deploy.outcome }}
-          version: v0.1.1
+          version: ${{ github.ref }}
 
