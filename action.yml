@@ -42,7 +42,7 @@ runs:
         GOOGLE_CLOUD_PROJECT: ${{ inputs.google-cloud-project }}
         SA_KEY: ${{ inputs.service-account-keyfile }}
         TEAM: ${{ inputs.team}}
-        SERVICE: ${{ inputs.environment }}
+        SERVICE: ${{ inputs.service }}
         ENVIRONMENT: ${{ inputs.environment }}
         STATUS: ${{ inputs.status }}
         RESULT: ${{ inputs.result }}
