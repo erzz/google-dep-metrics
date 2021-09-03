@@ -20,16 +20,18 @@ Unfortunately almost all inputs are mandatory as it is not easy to give sane def
 
 For wide scale adoption across multiple projects, consider using automatic values such as attributes of the github context object or outputs from previous steps. I will try to give some examples here - but go crazy!
 
-| Input                     | Default | Details                                                                                                       | Possible Automatic Example                 |
-| ------------------------- | ------- | ------------------------------------------------------------------------------------------------------------- | ------------------------------------------ |
-| `google-cloud-project`    | none    | The Google Cloud project-id to which the metrics should be sent                                               | N/A                                        |
-| `service-account-keyfile` | none    | A secret holding the service account keyfile to use for authentication with your project                      | `${{ secrets.METRIC_SA_KEY }}`             |
-| `team`                    | none    | The name of the team the deployed service belongs to                                                          | `${{ github.repository_owner }}`           |
-| `service`                 | none    | The name of the service or application being deployed                                                         | Some trimming of the above to project name |
-| `environment`             | none    | The environment into which the service/application is being deployed                                          | `${{ github.ref }}`                        |
-| `status`                  | none    | What stage of the deployment process is occurring (suggest either 'started' or 'finished')                    | N/A                                        |
-| `result`                  | none    | The result so far. (suggest one of 'queued' 'pending' 'error' 'in_progress' 'failure' 'inactive' or 'success' | `${{ steps.deploy.outcome }}`              |
-| `version`                 | none    | The version or commit being deployed (e.g. v1.0.5 or git short SHA)                                           | `${{ github.sha }}` or `${{ github.sha }}` |
+| Input                     | Default | Details                                                                                                       | Possible Automatic Example                                |
+| ------------------------- | ------- | ------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------- |
+| `google-cloud-project`    | none    | The Google Cloud project-id to which the metrics should be sent                                               | N/A                                                       |
+| `service-account-keyfile` | none    | A secret holding the service account keyfile to use for authentication with your project                      | `${{ secrets.METRIC_SA_KEY }}`                            |
+| `team`                    | none    | The name of the team the deployed service belongs to                                                          | `${{ github.repository_owner }}`                          |
+| `service`                 | none    | The name of the service or application being deployed                                                         | Some trimming of the above to project name                |
+| `environment`             | none    | The environment into which the service/application is being deployed                                          | `${{ github.ref }}`                                       |
+| `status`                  | none    | What stage of the deployment process is occurring (suggest either 'started' or 'finished')                    | N/A                                                       |
+| `result`                  | none    | The result so far. (suggest one of 'queued' 'pending' 'error' 'in_progress' 'failure' 'inactive' or 'success' | `${{ steps.deploy.outcome }}`                             |
+| `version`                 | none    | The version or commit being deployed (e.g. v1.0.5 or git short SHA)                                           | `${{ github.sha }}` or `${{ github.ref }}` for production |
+
+A recommendation of mine is also to use a slugify action early in your workflow to give you some much nicer values to play with as inputs such as SHORT_SHA's and Branch Names without needing to mess around stripping the lazy options Github actions provides!
 
 ## Example usage
 
