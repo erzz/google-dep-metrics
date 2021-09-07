@@ -49,9 +49,7 @@ runs:
         VERSION: ${{ inputs.version }}
         METRIC_VALUE: ${{ inputs.metric-value }}
       run: |
-        python -m venv venv
-        source venv/bin/activate
-        pip install -r requirements.txt
         echo "$SA_KEY" > $(pwd)/sa.json
         export GOOGLE_APPLICATION_CREDENTIALS=$(pwd)/sa.json
-        python3 push_deploy_metric.py --team "$TEAM" --service "$SERVICE" --environment "$ENVIRONMENT" --status "$STATUS" --result "$RESULT" --version "$VERSION" --metric-value "$METRIC_VALUE"
+        python -m pip install google-cloud-monitoring
+        python3 ${{ github.action_path }}/push_deploy_metric.py --team "$TEAM" --service "$SERVICE" --environment "$ENVIRONMENT" --status "$STATUS" --result "$RESULT" --version "$VERSION" --metric-value "$METRIC_VALUE"
