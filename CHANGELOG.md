@@ -1,3 +1,10 @@
+## [1.0.1](https://github.com/erzz/google-dep-metrics/compare/v1.0.0...v1.0.1) (2021-09-07)
+
+
+### Bug Fixes
+
+* correct the path when using action remotely ([98ca37d](https://github.com/erzz/google-dep-metrics/commit/98ca37d5c932d3c8c238cd63f671b55afd6a586c))
+
 # 1.0.0 (2021-09-03)
 
 
