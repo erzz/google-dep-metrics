@@ -19,7 +19,7 @@ inputs:
   service-account:
     description: "The service acount to impersonate when `gcp-auth-type` is `oidc`"
     required: false
-  workload_identity_provider:
+  workload-identity-provider:
     description: "The workload identity provider to utilise when `gcp-auth-type` is `oidc`"
     required: false
   team:
@@ -53,7 +53,7 @@ runs:
       uses: google-github-actions/auth@v0
       with:
         token_format: access_token
-        workload_identity_provider: ${{ inputs.workload-identity-provider }}
+        workload-identity-provider: ${{ inputs.workload-identity-provider }}
         service_account: ${{ inputs.service-account }}
         create_credentials_file: true
         export_environment_variables: false
