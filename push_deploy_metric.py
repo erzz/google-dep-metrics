@@ -23,7 +23,7 @@ if args.auth_type == "sa-key":
     credentials = oauth2.service_account.Credentials.from_service_account_file(
         os.environ["GOOGLE_APPLICATION_CREDENTIALS"])
 elif args.auth_type == "oidc":
-    credentials = oauth2._service_account_async.IDTokenCredentials.from_service_account_file(
+    credentials = oauth2.service_account_async.IDTokenCredentials.from_service_account_file(
         os.environ["GOOGLE_APPLICATION_CREDENTIALS"])
 else:
     print("Please provide either 'sa-key' or 'oidc' for the auth_type argument")
