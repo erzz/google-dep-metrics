@@ -14,14 +14,22 @@ parser.add_argument("--status", action="store", dest="dep_status", help="Either 
 parser.add_argument("--result", action="store", dest="dep_result", help="One of 'queued' 'pending' 'error' 'in_progress' 'failure' 'inactive' or 'success'", type=str)
 parser.add_argument("--version", action="store", dest="dep_version", help="The version or commit being deployed", type=str)
 parser.add_argument("--metric-value", action="store", dest="metric_value", help="The count to give for this deployment status - usually 1", type=int)
+parser.add_argument("--auth-type", action="store", dest="auth_type", help="One of either sa-key or oidc to determine the type of authentication file provided", type=str)
 args = parser.parse_args()
 
 project_id = os.environ["GOOGLE_CLOUD_PROJECT"]
 
-credentials = service_account.Credentials.from_service_account_file(
-    os.environ["GOOGLE_APPLICATION_CREDENTIALS"])
+if args.auth_type == "sa-key":
+    credentials = service_account.Credentials.from_service_account_file(
+        os.environ["GOOGLE_APPLICATION_CREDENTIALS"])
+elif args.auth_type == "oidc":
+    credentials = service_account.IDTokenCredentials.from_service_account_file(
+        os.environ["GOOGLE_APPLICATION_CREDENTIALS"])
+else:
+    print("Please provide either 'sa-key' or 'oidc' for the auth_type argument")
+    exit(1)
 
-# print(f"Using service account {credentials.service_account_email} for {project_id}")
+print(f"Using service account {credentials.service_account_email} for {project_id}")
 
 def write_time_series(project_id, metric_value):
     client = monitoring_v3.MetricServiceClient()
