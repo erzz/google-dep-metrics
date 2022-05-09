@@ -48,6 +48,7 @@ runs:
   using: "composite"
   steps:
     - name: Authenticate to GCP (OIDC)
+      id: oidc
       if: ${{ inputs.gcp-auth-type == 'oidc' }}
       uses: google-github-actions/auth@v0
       with:
@@ -55,13 +56,16 @@ runs:
         workload_identity_provider: ${{ inputs.workload-identity-provider }}
         service_account: ${{ inputs.service-account }}
         create_credentials_file: true
+        export_environment_variables: false
 
     - name: Authenticate to GCP (SA Key)
+      id: sa-key
       if: ${{ inputs.gcp-auth-type == 'sa-key' }}
       uses: google-github-actions/auth@v0
       with:
         credentials_json: ${{ inputs.service-account-keyfile }}
         create_credentials_file: true
+        export_environment_variables: false
 
     - name: Send metric
       shell: bash
@@ -75,5 +79,14 @@ runs:
         VERSION: ${{ inputs.version }}
         METRIC_VALUE: ${{ inputs.metric-value }}
       run: |
+        if [[ "${{ inputs.gcp-auth-type }}" == "oidc" ]]; then
+          echo "Detected OIDC Authentication"
+          export GOOGLE_APPLICATION_CREDENTIALS=${{ steps.oidc.outputs.credentials_file_path }}
+        elif [[ "${{ inputs.gcp-auth-type }}" == "sa-key" ]]; then
+          echo "Detected Service Account Key Authentication"
+          export GOOGLE_APPLICATION_CREDENTIALS=${{ steps.sa-key.outputs.credentials_file_path }}
+        else
+          echo "Could not determine the path to the credentials file, exiting." && exit 1
+        fi
         python -m pip install google-cloud-monitoring
         python3 ${{ github.action_path }}/push_deploy_metric.py --team "$TEAM" --service "$SERVICE" --environment "$ENVIRONMENT" --status "$STATUS" --result "$RESULT" --version "$VERSION" --metric-value "$METRIC_VALUE"
