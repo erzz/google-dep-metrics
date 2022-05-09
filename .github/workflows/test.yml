@@ -66,6 +66,8 @@ jobs:
         uses: ./
         with:
           gcp-auth-type: oidc
+          service-account: ${{ secrets.OIDC_SA_EMAIL }}
+          workload-identity-provider: ${{ secrets.WIP }}
           google-cloud-project: ${{ secrets.TEST_PROJECT }}
           team: google-dep-metrics
           service: action-app-oidc
@@ -73,5 +75,3 @@ jobs:
           status: finished
           result: ${{ steps.deploy.outcome }}
           version: ${{ github.ref }}
-          service-account: ${{ secrets.OIDC_SA_EMAIL }}
-          workload-identity-provider: ${{ secrets.WIP }}

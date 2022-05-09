@@ -5,14 +5,11 @@ branding:
   color: blue
   icon: bar-chart
 inputs:
-  # <---------- SELECT AUTHENTICATION METHOD --------->
+  # <----------- SELECT AUTHENTICATION METHOD ------------>
   gcp-auth-type:
     required: false
     description: "GCP Authentication is using Service Account Key by default. Specify `oidc` if you wish to use Open ID Connect authentication instead."
     default: "sa-key"
-  google-cloud-project:
-    description: "The Google Cloud project_id to which the metrics should be sent"
-    required: true
   service-account-keyfile:
     description: "A secret holding the service account keyfile used when `gcp-auth-type` is `sa-key`"
     required: false
@@ -22,6 +19,10 @@ inputs:
   workload-identity-provider:
     description: "The workload identity provider to utilise when `gcp-auth-type` is `oidc`"
     required: false
+  # <------------------ METRICS INPUTS ------------------->
+  google-cloud-project:
+    description: "The Google Cloud project_id to which the metrics should be sent"
+    required: true
   team:
     description: "The name of the team the deployed service belongs to."
     required: true
