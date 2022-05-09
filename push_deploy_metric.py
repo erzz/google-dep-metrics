@@ -2,7 +2,7 @@ import os
 import pprint
 import time
 import argparse
-from google.oauth2 import service_account
+import google.oauth2 as oauth2
 from google.cloud import monitoring_v3
 
 parser = argparse.ArgumentParser()
@@ -20,10 +20,10 @@ args = parser.parse_args()
 project_id = os.environ["GOOGLE_CLOUD_PROJECT"]
 
 if args.auth_type == "sa-key":
-    credentials = service_account.Credentials.from_service_account_file(
+    credentials = oauth2.service_account.Credentials.from_service_account_file(
         os.environ["GOOGLE_APPLICATION_CREDENTIALS"])
 elif args.auth_type == "oidc":
-    credentials = service_account.IDTokenCredentials.from_service_account_file(
+    credentials = oauth2._service_account_async.IDTokenCredentials.from_service_account_file(
         os.environ["GOOGLE_APPLICATION_CREDENTIALS"])
 else:
     print("Please provide either 'sa-key' or 'oidc' for the auth_type argument")
