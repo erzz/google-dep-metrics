@@ -56,7 +56,7 @@ runs:
         token_format: id_token
         workload_identity_provider: ${{ inputs.workload-identity-provider }}
         id_token_audience: ${{ inputs.workload-identity-provider }}
-        id_token_include_email: 
+        id_token_include_email: true
         service_account: ${{ inputs.service-account }}
         create_credentials_file: true
         export_environment_variables: true
