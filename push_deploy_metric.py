@@ -21,7 +21,7 @@ project_id = os.environ["GOOGLE_CLOUD_PROJECT"]
 credentials = service_account.Credentials.from_service_account_file(
     os.environ["GOOGLE_APPLICATION_CREDENTIALS"])
 
-print(f"Using service account {credentials.service_account_email} for {project_id}")
+# print(f"Using service account {credentials.service_account_email} for {project_id}")
 
 def write_time_series(project_id, metric_value):
     client = monitoring_v3.MetricServiceClient()
