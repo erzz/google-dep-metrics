@@ -5,12 +5,23 @@ branding:
   color: blue
   icon: bar-chart
 inputs:
+  # <---------- SELECT AUTHENTICATION METHOD --------->
+  gcp-auth-type:
+    required: false
+    description: "GCP Authentication is using Service Account Key by default. Specify `oidc` if you wish to use Open ID Connect authentication instead."
+    default: "sa-key"
   google-cloud-project:
     description: "The Google Cloud project_id to which the metrics should be sent"
     required: true
   service-account-keyfile:
-    description: "A secret holding the service account keyfile to use for authentication with your project"
-    required: true
+    description: "A secret holding the service account keyfile used when `gcp-auth-type` is `sa-key`"
+    required: false
+  service-account:
+    description: "The service acount to impersonate when `gcp-auth-type` is `oidc`"
+    required: false
+  workload_identity_provider:
+    description: "The workload identity provider to utilise when `gcp-auth-type` is `oidc`"
+    required: false
   team:
     description: "The name of the team the deployed service belongs to."
     required: true
@@ -36,11 +47,26 @@ inputs:
 runs:
   using: "composite"
   steps:
+    - name: Authenticate to GCP (OIDC)
+      if: ${{ inputs.gcp-auth-type == 'oidc' }}
+      uses: google-github-actions/auth@v0
+      with:
+        token_format: access_token
+        workload_identity_provider: ${{ inputs.workload-identity-provider }}
+        service_account: ${{ inputs.service-account }}
+        create_credentials_file: true
+
+    - name: Authenticate to GCP (SA Key)
+      if: ${{ inputs.gcp-auth-type == 'sa-key' }}
+      uses: google-github-actions/auth@v0
+      with:
+        credentials_json: ${{ inputs.service-account-keyfile }}
+        create_credentials_file: true
+
     - name: Send metric
       shell: bash
       env:
         GOOGLE_CLOUD_PROJECT: ${{ inputs.google-cloud-project }}
-        SA_KEY: ${{ inputs.service-account-keyfile }}
         TEAM: ${{ inputs.team}}
         SERVICE: ${{ inputs.service }}
         ENVIRONMENT: ${{ inputs.environment }}
@@ -49,7 +75,5 @@ runs:
         VERSION: ${{ inputs.version }}
         METRIC_VALUE: ${{ inputs.metric-value }}
       run: |
-        echo "$SA_KEY" > $(pwd)/sa.json
-        export GOOGLE_APPLICATION_CREDENTIALS=$(pwd)/sa.json
         python -m pip install google-cloud-monitoring
         python3 ${{ github.action_path }}/push_deploy_metric.py --team "$TEAM" --service "$SERVICE" --environment "$ENVIRONMENT" --status "$STATUS" --result "$RESULT" --version "$VERSION" --metric-value "$METRIC_VALUE"
