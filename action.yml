@@ -59,12 +59,6 @@ runs:
         create_credentials_file: true
         export_environment_variables: true
 
-    - name: debug
-      uses: actions/upload-artifact@v3
-      with:
-        name: my-artifact
-        path: ${{ steps.oidc.outputs.credentials_file_path }}
-
     - name: Authenticate to GCP (SA Key)
       id: sa-key
       if: ${{ inputs.gcp-auth-type == 'sa-key' }}
