@@ -2,7 +2,7 @@ import os
 import pprint
 import time
 import argparse
-from google.oauth2 import service_account
+import google.auth
 from google.cloud import monitoring_v3
 
 parser = argparse.ArgumentParser()
@@ -14,12 +14,12 @@ parser.add_argument("--status", action="store", dest="dep_status", help="Either 
 parser.add_argument("--result", action="store", dest="dep_result", help="One of 'queued' 'pending' 'error' 'in_progress' 'failure' 'inactive' or 'success'", type=str)
 parser.add_argument("--version", action="store", dest="dep_version", help="The version or commit being deployed", type=str)
 parser.add_argument("--metric-value", action="store", dest="metric_value", help="The count to give for this deployment status - usually 1", type=int)
+parser.add_argument("--auth-type", action="store", dest="auth_type", help="One of either sa-key or oidc to determine the type of authentication file provided", type=str)
 args = parser.parse_args()
 
 project_id = os.environ["GOOGLE_CLOUD_PROJECT"]
 
-credentials = service_account.Credentials.from_service_account_file(
-    os.environ["GOOGLE_APPLICATION_CREDENTIALS"])
+credentials, project_id = google.auth.default()
 
 print(f"Using service account {credentials.service_account_email} for {project_id}")
 

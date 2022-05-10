@@ -5,11 +5,23 @@ branding:
   color: blue
   icon: bar-chart
 inputs:
+  # <----------- SELECT AUTHENTICATION METHOD ------------>
+  gcp-auth-type:
+    required: false
+    description: "GCP Authentication is using Service Account Key by default. Specify `oidc` if you wish to use Open ID Connect authentication instead."
+    default: "sa-key"
+  service-account-keyfile:
+    description: "A secret holding the service account keyfile used when `gcp-auth-type` is `sa-key`"
+    required: false
+  service-account:
+    description: "The service acount to impersonate when `gcp-auth-type` is `oidc`"
+    required: false
+  workload-identity-provider:
+    description: "The workload identity provider to utilise when `gcp-auth-type` is `oidc`"
+    required: false
+  # <------------------ METRICS INPUTS ------------------->
   google-cloud-project:
     description: "The Google Cloud project_id to which the metrics should be sent"
-    required: true
-  service-account-keyfile:
-    description: "A secret holding the service account keyfile to use for authentication with your project"
     required: true
   team:
     description: "The name of the team the deployed service belongs to."
@@ -36,11 +48,29 @@ inputs:
 runs:
   using: "composite"
   steps:
+    - name: Authenticate to GCP (OIDC)
+      id: oidc
+      if: ${{ inputs.gcp-auth-type == 'oidc' }}
+      uses: google-github-actions/auth@v0
+      with:
+        workload_identity_provider: ${{ inputs.workload-identity-provider }}
+        service_account: ${{ inputs.service-account }}
+        create_credentials_file: true
+        export_environment_variables: true
+
+    - name: Authenticate to GCP (SA Key)
+      id: sa-key
+      if: ${{ inputs.gcp-auth-type == 'sa-key' }}
+      uses: google-github-actions/auth@v0
+      with:
+        credentials_json: ${{ inputs.service-account-keyfile }}
+        create_credentials_file: true
+        export_environment_variables: true
+
     - name: Send metric
       shell: bash
       env:
         GOOGLE_CLOUD_PROJECT: ${{ inputs.google-cloud-project }}
-        SA_KEY: ${{ inputs.service-account-keyfile }}
         TEAM: ${{ inputs.team}}
         SERVICE: ${{ inputs.service }}
         ENVIRONMENT: ${{ inputs.environment }}
@@ -49,7 +79,16 @@ runs:
         VERSION: ${{ inputs.version }}
         METRIC_VALUE: ${{ inputs.metric-value }}
       run: |
-        echo "$SA_KEY" > $(pwd)/sa.json
-        export GOOGLE_APPLICATION_CREDENTIALS=$(pwd)/sa.json
+        if [[ "${{ inputs.gcp-auth-type }}" == "oidc" ]]; then
+          echo "Detected OIDC Authentication"
+          export GOOGLE_APPLICATION_CREDENTIALS=${{ steps.oidc.outputs.credentials_file_path }}
+        elif [[ "${{ inputs.gcp-auth-type }}" == "sa-key" ]]; then
+          echo "Detected Service Account Key Authentication"
+          export GOOGLE_APPLICATION_CREDENTIALS=${{ steps.sa-key.outputs.credentials_file_path }}
+        else
+          echo "Could not determine the path to the credentials file, exiting." && exit 1
+        fi
+
+        # Send metric
         python -m pip install google-cloud-monitoring
-        python3 ${{ github.action_path }}/push_deploy_metric.py --team "$TEAM" --service "$SERVICE" --environment "$ENVIRONMENT" --status "$STATUS" --result "$RESULT" --version "$VERSION" --metric-value "$METRIC_VALUE"
+        python3 ${{ github.action_path }}/push_deploy_metric.py --auth-type "${{ inputs.gcp-auth-type }}" --team "$TEAM" --service "$SERVICE" --environment "$ENVIRONMENT" --status "$STATUS" --result "$RESULT" --version "$VERSION" --metric-value "$METRIC_VALUE"

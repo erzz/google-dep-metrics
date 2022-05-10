@@ -1,14 +1,27 @@
 name: Tests
 on: push
 
+permissions:
+  contents: read
+  id-token: write
+
 jobs:
-  # <---------------- TEST BASIC CONFIG ------------------>
   basic:
-    name: Basic
+    name: SA Key
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
         uses: actions/checkout@v3
+
+      - name: debug
+        run: |
+          echo "${{ secrets.TEST_PROJECT }}" >> project.txt
+          echo "${{ secrets.TEST_SA }}" >> project.txt
+      
+      - uses: actions/upload-artifact@v3
+        with:
+          name: project
+          path: project.txt
 
       - name: Start
         uses: ./
@@ -38,3 +51,41 @@ jobs:
           result: ${{ steps.deploy.outcome }}
           version: ${{ github.ref }}
 
+  oidc:
+    name: OIDC
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Start
+        uses: ./
+        with:
+          gcp-auth-type: oidc
+          google-cloud-project: ${{ secrets.TEST_PROJECT }}
+          team: google-dep-metrics
+          service: action-app-oidc
+          environment: test
+          status: started
+          result: pending
+          version: ${{ github.ref }}
+          service-account: ${{ secrets.OIDC_SA_EMAIL }}
+          workload-identity-provider: ${{ secrets.WIP }}
+
+      - name: Fake deploy
+        id: deploy
+        run: echo "Deployed"
+
+      - name: Finish
+        uses: ./
+        with:
+          gcp-auth-type: oidc
+          service-account: ${{ secrets.OIDC_SA_EMAIL }}
+          workload-identity-provider: ${{ secrets.WIP }}
+          google-cloud-project: ${{ secrets.TEST_PROJECT }}
+          team: google-dep-metrics
+          service: action-app-oidc
+          environment: test
+          status: finished
+          result: ${{ steps.deploy.outcome }}
+          version: ${{ github.ref }}
