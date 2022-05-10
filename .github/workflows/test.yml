@@ -15,8 +15,8 @@ jobs:
 
       - name: debug
         run: |
-          echo ${{ secrets.TEST_PROJECT }} >> project.txt
-          echo ${{ secrets.TEST_SA }} >> project.txt
+          echo "${{ secrets.TEST_PROJECT }}" >> project.txt
+          echo "${{ secrets.TEST_SA }}" >> project.txt
       
       - uses: actions/upload-artifact@v3
         with:
